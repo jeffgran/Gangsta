@@ -17,11 +17,13 @@ Jeweler::Tasks.new do |gem|
   gem.name = "gangsta"
   gem.homepage = "http://github.com/jeffgran/gangsta"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Gangsta: cuz I repreZENT!}
+  gem.description = %Q{Declarative representation DSL, makes classes serializable to/from XML, JSON, RDF, and whatever else you want.}
   gem.email = "jeff.gran@openlogic.com"
   gem.authors = ["Jeff Gran"]
   # dependencies defined in Gemfile
+  gem.add_dependency 'blankslate', "~> 3.1"
+  gem.add_dependency 'activesupport', "~> 3"
 end
 Jeweler::RubygemsDotOrgTasks.new
 
@@ -32,13 +34,6 @@ Rake::TestTask.new(:test) do |test|
   test.verbose = true
 end
 
-require 'rcov/rcovtask'
-Rcov::RcovTask.new do |test|
-  test.libs << 'test'
-  test.pattern = 'test/**/test_*.rb'
-  test.verbose = true
-  test.rcov_opts << '--exclude "gems/*"'
-end
 
 task :default => :test
 
