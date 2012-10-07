@@ -13,8 +13,8 @@ describe Gangsta do
         end
 
         gangsta do
-          id :id
-          name :name
+          id
+          name
         end
 
         def ==(another)
@@ -78,13 +78,13 @@ describe Gangsta do
         end
 
         gangsta :compact do
-          title :title
-          excerpt :excerpt
+          title
+          excerpt
         end
 
         gangsta :full do
-          title :title
-          body :body
+          title
+          body
         end
 
       end
@@ -107,7 +107,7 @@ describe Gangsta do
       before do
         class BriefPost < Post
           gangsta :compact do
-            title :title
+            title
           end
         end
       end

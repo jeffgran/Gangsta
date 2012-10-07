@@ -1,6 +1,9 @@
 require 'blankslate'
 require 'pp'
 require 'active_support/inflector'
+require 'rdf'
+require 'nokogiri'
+require 'rdf/rdfxml'
 Dir.glob(File.dirname(__FILE__) + '/gangsta/*') {|f| require f}
 
 module Gangsta
@@ -28,12 +31,13 @@ module Gangsta
                              [nil, {}]
                            else
                              puts "warning... don't understand arguments to #gangsta. using defaults."
+                             [nil,nil]
                            end
 
       dict_name ||= (options[:dictionary] || :default)
 
       dict = if block_given?
-               gangsta_dictionaries[dict_name] = Dictionary.new.tap do |d|
+               gangsta_dictionaries[dict_name] = Dictionary.new(self).tap do |d|
                  d.definer.instance_eval(&block)
                end
              else
@@ -45,7 +49,7 @@ module Gangsta
 
 
     def gangstify(string, options={})
-      options = {transformer: :simple, dictionary: :default}.merge(options)
+      options = {format: :simple, dictionary: :default}.merge(options)
       init_args = options[:initialization_args] || (self.respond_to?(:default_initialization_args) ? default_initialization_args : nil)
 
       obj = if init_args
@@ -53,10 +57,12 @@ module Gangsta
             else
               self.new
             end
+      
+      dict = self.gangsta(dictionary: options[:dictionary])
 
-      proxy = ::Gangsta::Librarian.new(obj, self.gangsta(dictionary: options[:dictionary]))
+      proxy = ::Gangsta::Librarian.new(obj, dict)
 
-      ::Gangsta::Transformer.from_sym(options[:transformer]).deserialize(string, proxy)
+      ::Gangsta::Transformer.from_sym(options[:format]).deserialize(string, proxy)
       obj
     end
   end
@@ -64,9 +70,12 @@ module Gangsta
   module InstanceMethods
     def as_gangsta(options={})
       #defaults
-      options = {transformer: :simple, dictionary: :default}.merge(options)
+      options = {format: :simple, dictionary: :default}.merge(options)
+      trans = ::Gangsta::Transformer.from_sym(options[:format])
+      dict = self.class.gangsta(dictionary: options[:dictionary])
+      bound_dict = dict.bound_to(self)
 
-      ::Gangsta::Transformer.from_sym(options[:transformer]).serialize(self, self.class.gangsta(dictionary: options[:dictionary]))
+      trans.serialize(bound_dict)
 
     end
   end

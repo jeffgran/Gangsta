@@ -1,14 +1,14 @@
 module Gangsta
   class SimpleTransformer < Transformer
-    def serialize(object, dictionary)
+    def serialize(dictionary)
       out = []
-      dictionary.definitions.each do |word|
-        name = if word.vocab
-                 "#{word.vocab}:#{word.name}"
+      dictionary.definitions.each do |attr|
+        name = if attr.vocab
+                 "#{attr.vocab}:#{attr.name}"
                else
-                 word.name
+                 attr.name
                end
-        out << "#{name} is #{object.send word.calculator_method}"
+        out << "#{name} is #{attr.value}"
       end
       out.join("\n")
     end

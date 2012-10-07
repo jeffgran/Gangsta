@@ -24,6 +24,9 @@ Jeweler::Tasks.new do |gem|
   # dependencies defined in Gemfile
   gem.add_dependency 'blankslate', "~> 3.1"
   gem.add_dependency 'activesupport', "~> 3"
+  gem.add_dependency 'rdf', "~> 0.3"
+  gem.add_dependency 'rdf-rdfxml', "~> 0.3"
+  gem.add_dependency 'nokogiri'
 end
 Jeweler::RubygemsDotOrgTasks.new
 

@@ -5,6 +5,9 @@ source "http://rubygems.org"
 
 gem 'blankslate'
 gem 'activesupport', "~> 3"    
+gem 'rdf', "~> 0.3"
+gem 'rdf-rdfxml', "~> 0.3"
+gem 'nokogiri'
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
