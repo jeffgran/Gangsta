@@ -68,16 +68,31 @@ module Gangsta
           attr.bound_to(@bound_object)
         end
       end
+
+      def set_value(name, value, options={})
+        setter = "#{name}=".to_sym
+      
+        if (@bound_object.respond_to? setter) &&
+            (self.has_definition_for?(name.to_sym))
+          @bound_object.send(setter, value)
+        end
+      end
     end
 
   class Definition
-    attr_accessor :getter, :name, :vocab
+    attr_accessor :getter, :name, :vocab, :type
 
     def initialize(dictionary, name, options)
       @dictionary = dictionary
       self.vocab = options[:vocab]
       self.name = name.to_sym
-      self.getter = name.to_sym
+
+      if block_given?
+        options[:type] ||= :array
+        
+      else
+        self.getter = name.to_sym
+      end
     end
 
     def bound_to(instance)
@@ -107,15 +122,6 @@ module Gangsta
     def initialize(obj, dict)
       @object = obj
       @dictionary = dict
-    end
-
-    def set_value(name, value, options={})
-      setter = "#{name}=".to_sym
-      
-      if (@object.respond_to? setter) &&
-          (@dictionary.has_definition_for?(name.to_sym))
-        @object.send(setter, value)
-      end
     end
   end
 end

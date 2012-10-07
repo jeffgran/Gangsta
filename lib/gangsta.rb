@@ -60,9 +60,9 @@ module Gangsta
       
       dict = self.gangsta(dictionary: options[:dictionary])
 
-      proxy = ::Gangsta::Librarian.new(obj, dict)
+      bound_dict = dict.bound_to(obj)
 
-      ::Gangsta::Transformer.from_sym(options[:format]).deserialize(string, proxy)
+      ::Gangsta::Transformer.from_sym(options[:format]).deserialize(string, bound_dict)
       obj
     end
   end
