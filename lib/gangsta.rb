@@ -1,10 +1,12 @@
 require 'blankslate'
 require 'pp'
 require 'active_support/inflector'
+require 'active_support/core_ext'
 require 'rdf'
 require 'nokogiri'
 require 'rdf/rdfxml'
-Dir.glob(File.dirname(__FILE__) + '/gangsta/*') {|f| require f}
+require 'require_options'
+Dir.glob(File.dirname(__FILE__) + '/gangsta/**/*.rb') {|f| puts "requiring #{f}"; require f}
 
 module Gangsta
   def self.included(base)
@@ -17,8 +19,8 @@ module Gangsta
 
     def gangsta_dictionaries
       parent_dicts = (self.superclass.gangsta_dictionaries rescue {}) || {}
-      @gangsta_dictionaries ||= {}
-      @gangsta_dictionaries = parent_dicts.merge(@gangsta_dictionaries)
+      @gangsta_schemas ||= {}
+      @gangsta_schemas = parent_dicts.merge(@gangsta_schemas)
     end
     protected :gangsta_dictionaries
     
@@ -34,10 +36,10 @@ module Gangsta
                              [nil,nil]
                            end
 
-      dict_name ||= (options[:dictionary] || :default)
+      dict_name ||= (options[:schema] || :default)
 
       dict = if block_given?
-               gangsta_dictionaries[dict_name] = Dictionary.new(self).tap do |d|
+               gangsta_dictionaries[dict_name] = Schema.new(:class => self).tap do |d|
                  d.definer.instance_eval(&block)
                end
              else
@@ -49,7 +51,7 @@ module Gangsta
 
 
     def gangstify(string, options={})
-      options = {format: :simple, dictionary: :default}.merge(options)
+      options = {format: :simple, schema: :default}.merge(options)
       init_args = options[:initialization_args] || (self.respond_to?(:default_initialization_args) ? default_initialization_args : nil)
 
       obj = if init_args
@@ -58,7 +60,7 @@ module Gangsta
               self.new
             end
       
-      dict = self.gangsta(dictionary: options[:dictionary])
+      dict = self.gangsta(schema: options[:schema])
 
       bound_dict = dict.bound_to(obj)
 
@@ -70,10 +72,12 @@ module Gangsta
   module InstanceMethods
     def as_gangsta(options={})
       #defaults
-      options = {format: :simple, dictionary: :default}.merge(options)
+      options = {format: :simple, schema: :default}.merge(options)
       trans = ::Gangsta::Transformer.from_sym(options[:format])
-      dict = self.class.gangsta(dictionary: options[:dictionary])
+      dict = self.class.gangsta(schema: options[:schema])
       bound_dict = dict.bound_to(self)
+
+      #debugger
 
       trans.serialize(bound_dict)
 
