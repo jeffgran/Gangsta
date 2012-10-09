@@ -10,7 +10,7 @@ module Gangsta
     include SchemaTree
     
     attr_reader :schema
-    delegate :name, :getter, to: :schema
+    delegate :name, :getter, :setter, :classname, to: :schema
 
     def initialize(schema, object, parent)
       @schema = schema
@@ -52,9 +52,13 @@ module Gangsta
       !bound_object.nil?
     end
 
+    def loosely_bound?
+      @bound_object.nil?
+    end
+
     def value
       if self.root?
-        self.bound_object
+        #self.bound_object
       elsif !self.bound_object.respond_to?(getter)
         puts "warning: #{self.bound_object} does not respond to getter #{getter}. returning nil."
         nil
@@ -63,10 +67,16 @@ module Gangsta
       end
     end
 
-    def set_value(value)
+    def set_value(val)
       if bound_object.respond_to?(setter)
-        bound_object.send(setter, value)
+        bound_object.send(setter, val)
+      elsif parent.loosely_bound? and parent.classname and !parent.root?
+        obj = parent.classname.constantize.new
+        parent.set_value(obj)
+        @bound_object = obj
+        bound_object.send(setter,val)
       end
+
     end
   end
 end
