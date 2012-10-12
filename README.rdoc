@@ -1,6 +1,23 @@
-= gangsta
+= gangsta!
+(cuz I repreSENT!)
 
-Description goes here.
+Gangsta is not for everyone. The following tradeoffs were made in the design:
+
+* flexibility of schema is less important than:
+  * flexibility of interchangeable formats (serializing and deserializing)
+  * dsl as simple and as readable as possible
+
+
+
+
+
+
+
+
+
+Snoop Dogg: "I'm not down with the republican party, or the democratic party. I represent the Gangsta party."
+Larry King: "The Gangsta party."
+Snoop: "Yes sir."
 
 == Contributing to gangsta
  

@@ -7,7 +7,7 @@ module Gangsta
     def method_missing(sym, *args, &block)
       raise ArgumentError unless (opts = (args.first || {})).is_a? ::Hash
       opts = {name: sym}.merge(opts)
-      @dictionary.add_definable(opts, &block)
+      @dictionary.add_child_schema(opts, &block)
     end
   end
 end

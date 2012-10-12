@@ -17,7 +17,7 @@ describe Gangsta::Schema do
 
   it 'can add children' do
     root = Gangsta::Schema.new(name: 'test')
-    root.add_definable(name: 'testchild')
+    root.add_child_schema(name: 'testchild')
     root.children.first.name.should == :testchild
     root.leaf?.should be_false
     root.children.first.leaf?.should be_true
@@ -27,16 +27,16 @@ describe Gangsta::Schema do
     Gangsta::Definer.should === Gangsta::Schema.new(name: :test).definer
   end
 
-  it 'defaults getter and setter to match name' do
+  it 'defaults reader and writer to match name' do
     t = Gangsta::Schema.new(name: :test)
-    t.getter.should == :test
-    t.setter.should == :test=
+    t.reader.should == :test
+    t.writer.should == :test=
   end
 
-  it 'should allow override of getter and setter' do
-    t = Gangsta::Schema.new(name: :test, getter: :get_test, setter: :set_test)
-    t.getter.should == :get_test
-    t.setter.should == :set_test
+  it 'should allow override of reader and writer' do
+    t = Gangsta::Schema.new(name: :test, reader: :get_test, writer: :set_test)
+    t.reader.should == :get_test
+    t.writer.should == :set_test
   end
 
   
@@ -44,8 +44,8 @@ describe Gangsta::Schema do
   context 'tree structure' do
     let (:root) { 
       root = Gangsta::Schema.new(name: 'test')
-      root.add_definable(name: 'testchild')
-      root.children.first.add_definable(name: 'grandchild')
+      root.add_child_schema(name: 'testchild')
+      root.children.first.add_child_schema(name: 'grandchild')
       root
     }
     let (:child) { root.children.first }

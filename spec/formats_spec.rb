@@ -4,21 +4,40 @@ require 'helper'
 shared_examples 'bidirectional transformers in multiple formats' do
   # it 'should serialize to RDF/XML and back again' do
   #   before = post
+  #   # pp "before:"
+  #   # pp post
   #   rdfxml = post.as_gangsta(format: :rdfxml)
+  #   # pp "xml:"
+  #   # puts rdfxml
   #   after = Post.gangstify(rdfxml, format: :rdfxml)
+  #   # pp "after:"
+  #   # pp after
   #   before.should == after
   # end
 
   it 'should serialize to simple XML and back again' do
     before = post
-pp "before:"
-pp post
+    # pp "before:"
+    # pp post
     xml = post.as_gangsta(format: :simple_xml)
-pp "xml:"
-puts xml
+    # pp "xml:"
+    # puts xml
     after = Post.gangstify(xml, format: :simple_xml)
-pp "after:"
-pp after
+    # pp "after:"
+    # pp after
+    before.should == after
+  end
+
+  it 'should serialize to simple JSON and back again' do
+    before = post
+    # pp "before:"
+    # pp post
+    json = post.as_gangsta(format: :simple_json)
+    # pp "json:"
+    # puts json
+    after = Post.gangstify(json, format: :simple_json)
+    # pp "after:"
+    # pp after
     before.should == after
   end
 end
@@ -26,7 +45,7 @@ end
 describe Gangsta do
   context "simple dictionary" do
 
-    before do
+    before(:all) do
       class Post
         include Gangsta
         attr_accessor :title, :body, :author_email
@@ -44,6 +63,9 @@ describe Gangsta do
         
       end
     end
+    after(:all) do
+      Object.send :remove_const, :Post
+    end
 
     let(:post) { Post.new.tap do |p|
         p.title = "This is the title"
@@ -56,7 +78,7 @@ describe Gangsta do
   end
   
   context 'nested dictionary' do
-    before do
+    before(:all) do
       class Post
         include Gangsta
         attr_accessor :title, :body, :author_email, :author_name, :comments
@@ -64,26 +86,21 @@ describe Gangsta do
         gangsta do
           title vocab: "http://purl.org/dc/terms/"
           body vocab: "http://purl.org/dc/terms/"
-          author_info type: :passthrough do
+          author_info do
             author_name vocab: "http://purl.org/dc/terms/"
             author_email vocab: "http://purl.org/dc/terms/"
           end
 
-          comments getter: :my_comments, type: :list, classname: 'Comment' do
-            comment type: :passthrough do
-              text
-              author
+          comments reader: :my_comments, type: :list do
+            comment classname: 'Comment' do
+              text vocab: "http://purl.org/dc/terms/"
+              author vocab: "http://purl.org/dc/terms/"
             end
           end
         end
         
         def my_comments
-          @comments ||= ['uno', 'dos', 'tres'].map do |txt|
-            Comment.new.tap do |c|
-              c.text = txt
-              c.author = "anonymous #{txt}"
-            end
-          end
+          @comments ||= []
         end
 
         def comments_map
@@ -105,12 +122,23 @@ describe Gangsta do
         attr_accessor :text, :author
       end
     end
+    after(:all) do
+      Object.send :remove_const, :Post
+      Object.send :remove_const, :Comment
+    end
 
     let(:post) { Post.new.tap do |p|
         p.title = "This is the title"
         p.body = "This is the body"
         p.author_email = "author@example.com"
         p.author_name = "Yer Mom"
+        
+        p.comments = ['uno', 'dos', 'tres'].map do |txt|
+          Comment.new.tap do |c|
+            c.text = txt
+            c.author = "anonymous #{txt}"
+          end
+        end
       end
     }
 

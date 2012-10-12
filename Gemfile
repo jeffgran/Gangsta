@@ -3,12 +3,13 @@ source "http://rubygems.org"
 # Example:
 #   gem "activesupport", ">= 2.3.5"
 
-gem 'blankslate'
+gem 'blankslate', '~> 3.1'
 gem 'activesupport', "~> 3"    
 gem 'rdf', "~> 0.3"
 gem 'rdf-rdfxml', "~> 0.3"
-gem 'nokogiri'
+gem 'nokogiri', "~> 1.5"
 gem 'require_options', "~> 1.1"
+gem 'jsonify', "~> 0.4"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

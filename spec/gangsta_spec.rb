@@ -77,12 +77,12 @@ describe Gangsta do
           body[0..5] + '...'
         end
 
-        gangsta :compact do
+        gangsta schema: :compact do
           title
           excerpt
         end
 
-        gangsta :full do
+        gangsta schema: :full do
           title
           body
         end
@@ -98,15 +98,15 @@ describe Gangsta do
 
     it 'should serialize the specified dictionary' do
       
-      post.as_gangsta(dictionary: :compact).should == "title is How to make a blog\nexcerpt is Step o..."
-      post.as_gangsta(dictionary: :full).should == "title is How to make a blog\nbody is Step one: install rails. Step two: No step two!"
+      post.as_gangsta(schema: :compact).should == "title is How to make a blog\nexcerpt is Step o..."
+      post.as_gangsta(schema: :full).should == "title is How to make a blog\nbody is Step one: install rails. Step two: No step two!"
 
     end
 
     context "with subclass overriding a dictionary" do
       before do
         class BriefPost < Post
-          gangsta :compact do
+          gangsta schema: :compact do
             title
           end
         end
@@ -117,7 +117,7 @@ describe Gangsta do
         end
       }
       it "should use the child's dictionary" do
-        briefpost.as_gangsta(dictionary: :compact).should == "title is How to make a blog"
+        briefpost.as_gangsta(schema: :compact).should == "title is How to make a blog"
       end
     end
 

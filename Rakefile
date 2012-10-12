@@ -26,7 +26,8 @@ Jeweler::Tasks.new do |gem|
   gem.add_dependency 'activesupport', "~> 3"
   gem.add_dependency 'rdf', "~> 0.3"
   gem.add_dependency 'rdf-rdfxml', "~> 0.3"
-  gem.add_dependency 'nokogiri'
+  gem.add_dependency 'nokogiri', "~> 1.5"
+  gem.add_dependency 'jsonify', '~> 0.4'
 end
 Jeweler::RubygemsDotOrgTasks.new
 

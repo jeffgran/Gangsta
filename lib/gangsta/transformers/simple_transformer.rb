@@ -1,22 +1,24 @@
 module Gangsta
   class SimpleTransformer < Transformer
-    def serialize(dictionary)
+    def serialize(schema)
       out = []
-      dictionary.definitions.each do |attr|
-        name = if attr.vocab
-                 "#{attr.vocab}:#{attr.name}"
+      schema.children.each do |s|
+        name = if s.vocab
+                 "#{s.vocab}:#{s.name}"
                else
-                 attr.name
+                 s.name
                end
-        out << "#{name} is #{attr.value}"
+        out << "#{name} is #{s.value}"
       end
       out.join("\n")
     end
 
-    def deserialize(string, object_proxy)
+    def deserialize(string, schema)
       string.each_line do |line|
         name, value = line.strip.split(" is ")
-        object_proxy.set_value(name, value)
+        if s = schema[name.to_sym]
+          s.set_value(value)
+        end
       end
     end
   end

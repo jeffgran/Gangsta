@@ -1,46 +1,70 @@
+require 'nokogiri'
+
 module Gangsta
   class SimpleXmlTransformer < Transformer
-    def serialize(dictionary)
+    def serialize(schema)
       builder = Nokogiri::XML::Builder.new do |xml|
-        build_dict(dictionary, xml)
+        build_tree(schema, xml)
       end
-
       builder.to_xml
     end
 
-    def build_dict(dictionary, xml)
+    def build_tree(schema, xml)
 
-      xml.send("#{dictionary.name}_") do
-        dictionary.definitions.each do |attr|
-          #pp "trying to get value for #{attr.name} while looping through #{dictionary.name} definitions"
-          xml.send("#{attr.name}_") { xml.text(attr.value)  }
-        end
-        dictionary.dictionaries.each do |dict|
-          build_dict(dict, xml)
+      xml.send("#{schema.name}_") do
+        schema.children.each do |s|
+          if s.leaf?
+            xml.send("#{s.name}_") { xml.text(s.value)  }
+          else
+            build_tree(s, xml)
+          end
         end
       end
     end
 
-    def deserialize(string, dictionary)
+    def deserialize(string, schema)
       doc = Nokogiri::XML::Document.parse(string)
-      @current_path = [doc.root.name]
-      deserialize_node(doc.root, dictionary)
+
+
+      deserialize_tree(doc.root, schema)
     end
 
-    def deserialize_node(parent, dictionary)
-      parent.element_children.each do |node|
+    def deserialize_schema(node, schema)
+      if schema.type == :list
+        deserialize_list(node, schema)
+      elsif schema.leaf?
+        #puts "  #{schema.name} . set_value (#{node.text})" 
+        schema.set_value(node.text)
+      else
+        deserialize_tree(node, schema)
+      end
+    end
+
+    def deserialize_list(node, schema)
+      # pp "in list!!!!!!!!!!!!!!!!!!"
+      # pp node.name
+      # pp schema.name
+      node.element_children.each_with_index do |elem, i|
+        #puts "building child. before, size is #{schema.size}"
+        schema.build_child
+        # puts "building child. after, size is #{schema.size}"
+        # puts "going to deserialize #{elem.name} xml elemnt to schema: #{schema[i].name}"
+        deserialize_tree(elem, schema[i])
+      end
+    end
+
+    def deserialize_tree(node, schema)
+      node.element_children.each do |node|
+
         next if node.text?
-        @current_path.push(node.name)
 
-        pp "Processing node (#{node.name}: #{node.text})"
-        puts "   - current path: #{@current_path}"
-        dictionary.set_value(@current_path, node.text)
+        if test = schema[node.name.to_sym]
+          schema = test
 
-        if node.element_children.any?
-          deserialize_node(node, dictionary)
+          deserialize_schema(node, schema)
+
+          schema = schema.parent
         end
-
-        @current_path.pop
       end
     end
   end

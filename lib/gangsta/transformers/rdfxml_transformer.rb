@@ -1,13 +1,23 @@
 module Gangsta
   class RdfTransformerBase < Transformer
 
-    def serialize(dictionary)
+    def serialize(schema)
       @graph = ::RDF::Graph.new
-      vocabs = {}
+      @vocabs = {}
+      schema.children.each do |s|
+        build_tree(s)
+      end
+    end
 
-      dictionary.definitions.each do |attr|
-        vocabs[attr.vocab] ||= RDF::Vocabulary.new(attr.vocab)
-        @graph << [attr.name, vocabs[attr.vocab][attr.name], attr.value]
+    def build_tree(schema)
+      @vocabs[schema.vocab] ||= RDF::Vocabulary.new(schema.vocab)
+      if schema.leaf?
+        # pp schema.name
+        # pp @vocabs[schema.vocab][schema.name]
+        # pp schema.value
+        @graph << [schema.name, @vocabs[schema.vocab][schema.name], schema.value]
+      else
+        build_tree(c)
       end
     end
   end

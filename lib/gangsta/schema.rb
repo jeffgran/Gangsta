@@ -11,7 +11,7 @@ module Gangsta
     end
 
     def [](sym)
-      raise ArgumentError unless Symbol === sym
+      raise ArgumentError, "Schema responds to [:name], where :name is the name of the direct child schema you want" unless Symbol === sym
       children.select{|c|c.name == sym}.tap do |arr|
         return arr.first if arr.size == 1
         return nil if arr.size == 0
@@ -60,29 +60,31 @@ module Gangsta
     include RequireOptions
     include SchemaTree
     
-    attr_accessor :name, :getter, :setter, :vocab, :type, :classname
+    attr_accessor :name, :reader, :writer, :vocab, :type, :classname
     
     def initialize(options)
-      allow_options(options, :class, :parent, :vocab, :name, :type, :getter, :setter, :classname)
-      require_options(options, :name)
-
-      #raise ArgumentError, "this shouldn't happen -- :class is for a root node and :parent is for a branch. don't have both" if options[:class] && options[:parent]
+      allow_options(options, :class, :parent, :vocab, :name, :type, :reader, :writer, :accessor, :classname, :schema)
 
       # just assign both now that we know we don't have both.
       @class = options[:class]
       @parent = options[:parent]
 
       @name = (@class ? @class.to_s.underscore.to_sym : options[:name]).to_sym
+      raise ArgumentError, "must supply :name to schema" if @name.nil?
 
       @vocab = options[:vocab].to_sym rescue nil
-      @getter = options[:getter] || self.name
-      @setter = options[:setter] || "#{self.name}=".to_sym
+      @reader = options[:reader] || options[:accessor].try(:to_sym) || self.name
+      @writer = options[:writer] || "#{options[:accessor] || self.name}=".to_sym
       @type = options[:type] || :obj
       @classname = options[:classname]
     end
 
     def bound_to(instance, parent=nil)
-      BoundSchema.new(self, instance, parent)
+      if type == :list
+        BoundList.new(self, instance, parent)
+      else
+        BoundSchema.new(self, instance, parent)
+      end
     end
 
     def bound?
@@ -105,19 +107,35 @@ module Gangsta
       Definer.new(self)
     end
 
-    def add_definable(options={}, &block)
-      allow_options(options, :vocab, :name, :type, :getter, :setter, :classname)
+    def add_child_schema(options={}, &block)
+      allow_options(options, :vocab, :name, :type, :reader, :writer, :classname, :accessor)
 
       #pp "adding definable #{options[:name]} to parent #{self.name}"
 
       options = {parent: self}.merge(options)
 
-      self.children << child = Schema.new(options).tap do |child|
+      klass = options[:type] == :list ? ListSchema : Schema
+
+      self.children << child = klass.new(options).tap do |child|
         if block_given? # block means it's a container, not a leaf
           child.definer.instance_eval(&block)
         end
       end
       child
+    end
+
+  end
+
+
+  class ListSchema < Schema
+    def child
+      children.first
+    end
+
+    def add_child_schema(options={}, &block)
+      require_options(options, :name)
+      raise InvalidSchemaError, "list `#{options[:name]}` cannot have more than one child. The child will represent each member of the list" if children.size > 0
+      super
     end
 
   end
