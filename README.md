@@ -1,11 +1,11 @@
-= gangsta!
+# gangsta!
 *(cuz I repreSENT!)*
 
-== The State of the Gangsta
+## The State of the Gangsta
 
 Gangsta is still experimental and in heavy flux. There are major feature holes and things that don't quite work. It's not ready for production use yet. Watch this space.
 
-== Purpose
+## Purpose
 
 For our API (in a rails app), for each object type, we had:
 * xml builder templates for xml content-type
@@ -17,7 +17,7 @@ For our API (in a rails app), for each object type, we had:
 I see 4-5 places where we are storing the same information (knowledge of the structure of the schema, and how to convert from object <--> schema <--> representation).
 
 
-== Design Goals
+## Design Goals
 * Simple, readable DSL for defining schemas
 * Serialize/Deserialize from multiple formats
 * Easy to write new "Transformers" to add new formats
@@ -31,7 +31,7 @@ Gangsta is not for everyone. The following tradeoffs are made in the design:
   * flexibility of interchangeable formats (serializing and deserializing)
   * dsl as simple and as readable as possible
 
-== Example
+## Example
 
 Here's a couple of classes and a Gangsta schema:
 
@@ -77,7 +77,7 @@ Here's what it can do:
 p.as_gangsta(format: :simple_xml)
 ```
 
-#=>
+###=>
 
 ```xml
 <?xml version="1.0"?>
@@ -102,7 +102,7 @@ or:
 string = p.as_gangsta(format: :simple_json)
 ```
 
-#=>
+###=>
 
 ```javascript
 {
@@ -131,16 +131,24 @@ And then it can consume that data with:
 Post.gangstify(string, format: :simple_json)
 ```
 
-#=>
+###=>
 
-    #<Post:0x00000101180130 @title="Hello", @body="This is the body", @comments=[#<Comment:0x0000010117a078 @text="First!">, #<Comment:0x00000101178ef8 @text="First! (Edit: dang.)">]>
+    #<Post:0x00000101180130 
+      @title="Hello", 
+      @body="This is the body", 
+      @comments=[
+        #<Comment:0x0000010117a078 @text="First!">, 
+        #<Comment:0x00000101178ef8 @text="First! (Edit: dang.)">
+      ]>
 
 
-==Inspiration
+##Inspiration
+
 * ROXML
 * Representable
+* And others
 
-==Homage
+##Homage
 
 Snoop Dogg: 
 
@@ -155,17 +163,8 @@ Snoop:
 > "Yes sir."
 
 
-== Contributing to gangsta
- 
-* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.
-* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it.
-* Fork the project.
-* Start a feature/bugfix branch.
-* Commit and push until you are happy with your contribution.
-* Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
-* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
 
-== Copyright
+## Copyright
 
 Copyright (c) 2012 Jeff Gran. See LICENSE.txt for
 further details.
