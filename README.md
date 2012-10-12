@@ -1,4 +1,4 @@
-# gangsta!
+# Gangsta!
 *(cuz I repreSENT!)*
 
 ## The State of the Gangsta
@@ -7,14 +7,15 @@ Gangsta is still experimental and in heavy flux. There are major feature holes a
 
 ## Purpose
 
-For our API (in a rails app), for each object type, we had:
+We had a problem. For our API (in a rails app), for each object type, we had:
 * xml builder templates for xml content-type
 * json_builder templates for json content-type
 * custom params parser to convert xml POST and PUT into params hash
-* In tests, a parallel set of mock classes to serialize to xml using ROXML (in order to simulate POST)
+* In tests, a parallel mock class to serialize to xml using ROXML (in order to simulate POST)
 * A separate RDF-based representation of certain objects
 
-I see 4-5 places where we are storing the same information (knowledge of the structure of the schema, and how to convert from object <--> schema <--> representation).
+I see 4-5 places where we are storing the same information -- knowledge of the structure of the schema, and how to convert from:
+* object <--> schema <--> representation
 
 
 ## Design Goals
