@@ -117,7 +117,7 @@ module Gangsta
       add(obj)
       obj
     rescue NameError => e
-      raise InvalidSchema, "In schema #{root.name} for #{root.class.to_s}, error trying to instantiate new #{child.classname}: class does not exist! (#{e.inspect}, #{e.message})"
+      raise InvalidSchema, "In schema #{root.name} for #{root.class.to_s}, error trying to instantiate new #{schema.child.classname}: class does not exist! (#{e.inspect}, #{e.message})"
     end
 
     def [](num)

@@ -84,17 +84,17 @@ describe Gangsta do
         attr_accessor :title, :body, :author_email, :author_name, :comments
 
         gangsta do
-          title vocab: "http://purl.org/dc/terms/"
-          body vocab: "http://purl.org/dc/terms/"
+          title
+          body
           author_info do
-            author_name vocab: "http://purl.org/dc/terms/"
-            author_email vocab: "http://purl.org/dc/terms/"
+            author_name
+            author_email
           end
 
           comments reader: :my_comments, type: :list do
             comment classname: 'Comment' do
-              text vocab: "http://purl.org/dc/terms/"
-              author vocab: "http://purl.org/dc/terms/"
+              text
+              author
             end
           end
         end
