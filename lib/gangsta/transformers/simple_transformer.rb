@@ -3,12 +3,7 @@ module Gangsta
     def serialize(schema)
       out = []
       schema.children.each do |s|
-        name = if s.vocab
-                 "#{s.vocab}:#{s.name}"
-               else
-                 s.name
-               end
-        out << "#{name} is #{s.value}"
+        out << "#{s.qname} is #{s.value}"
       end
       out.join("\n")
     end

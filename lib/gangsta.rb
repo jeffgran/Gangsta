@@ -5,6 +5,7 @@ require 'active_support/core_ext'
 require 'rdf'
 require 'rdf/rdfxml'
 require 'require_options'
+require 'gangsta/schema_tree'
 Dir.glob(File.dirname(__FILE__) + '/gangsta/**/*.rb') {|f| puts "requiring #{f}"; require f}
 
 module Gangsta

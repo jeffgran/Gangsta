@@ -3,20 +3,29 @@ module Gangsta
 
     def serialize(schema)
       @graph = ::RDF::Graph.new
-      @vocabs = {}
-      schema.children.each do |s|
-        build_tree(s)
-      end
+      build_tree(schema)
     end
 
     def build_tree(schema)
-      @vocabs[schema.vocab] ||= RDF::Vocabulary.new(schema.vocab)
-      if schema.leaf?
+      # puts '---'
+      # puts "build_tree(#{schema.name})"
+      # puts "leaf: #{schema.leaf?}"
+      # puts "value: #{schema.value}"
+      # puts "children: #{schema.children.size}"
+      unless schema.loosely_bound?
+        @graph << [RDF::URI(schema.uri), RDF.type, RDF::URI("#{schema.namespaces[schema.namespace]}#{schema.name}")]
+      end
+
+      if object = schema.value
+        # pp predicate
         # pp schema.name
-        # pp @vocabs[schema.vocab][schema.name]
         # pp schema.value
-        @graph << [schema.name, @vocabs[schema.vocab][schema.name], schema.value]
-      else
+        subject = RDF::URI("#{schema.root[:uri]}")
+        predicate = RDF::URI("#{schema.namespaces[schema.namespace]}#{schema.name}")
+        #TODO should not necessarily be schema.root -- it should be the nearest non-loosely bound ancestor schema
+        @graph << [RDF::URI(schema.root.uri), predicate, object]
+      end
+      schema.children.each do |c|
         build_tree(c)
       end
     end
@@ -25,15 +34,20 @@ module Gangsta
   class RdfTransformer < RdfTransformerBase
     def serialize(dictionary)
       super
-      @graph
+
     end
 
   end
 
   class RdfxmlTransformer < RdfTransformerBase
-    def serialize(dictionary)
+    def serialize(schema)
       super
-      @graph.dump(:rdfxml)
+
+      RDF::RDFXML::Writer.buffer(:prefixes => schema.namespaces) do |writer|
+        @graph.each_statement do |statement|
+          writer << statement
+        end
+      end
     end
 
     def deserialize(string, object_proxy)

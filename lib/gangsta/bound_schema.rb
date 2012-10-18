@@ -12,7 +12,7 @@ module Gangsta
     include Enumerable
     
     attr_reader :schema
-    delegate :name, :reader, :writer, :classname, :type, :vocab, to: :schema
+    delegate :name, :reader, :writer, :classname, :type, :namespace, :namespaces, :qname, :uri, to: :schema
 
     def initialize(schema, object, parent)
       @schema = schema
@@ -65,8 +65,9 @@ module Gangsta
     end
 
     def value
+      self.schema.value ||
       if self.root?
-        #self.bound_object
+        # nothing
       elsif !self.bound_object.respond_to?(reader)
         puts "warning: #{self.bound_object} does not respond to reader #{reader}. returning nil."
         nil

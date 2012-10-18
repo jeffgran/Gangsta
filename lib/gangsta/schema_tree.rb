@@ -43,7 +43,11 @@ module Gangsta
     end
 
     def namespaces
-      @namespaces || parent.namespaces
+      @namespaces || parent.try(:namespaces)
+    end
+
+    def namespace
+      @namespace || parent.try(:namespace)
     end
 
     def show_tree(level=0)

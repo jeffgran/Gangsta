@@ -39,6 +39,11 @@ describe Gangsta::Schema do
     t.writer.should == :set_test
   end
 
+  it 'can specify a static value' do
+    t = Gangsta::Schema.new(name: :test, value: 'a value')
+    t.value.should == 'a value'
+  end
+
   
 
   context 'tree structure' do

@@ -2,18 +2,6 @@ require 'helper'
 
 
 shared_examples 'bidirectional transformers in multiple formats' do
-  # it 'should serialize to RDF/XML and back again' do
-  #   before = post
-  #   # pp "before:"
-  #   # pp post
-  #   rdfxml = post.as_gangsta(format: :rdfxml)
-  #   # pp "xml:"
-  #   # puts rdfxml
-  #   after = Post.gangstify(rdfxml, format: :rdfxml)
-  #   # pp "after:"
-  #   # pp after
-  #   before.should == after
-  # end
 
   it 'should serialize to simple XML and back again' do
     before = post
@@ -43,16 +31,16 @@ shared_examples 'bidirectional transformers in multiple formats' do
 end
 
 describe Gangsta do
-  context "simple dictionary" do
+  context "simple schema" do
 
     before(:all) do
       class Post
         include Gangsta
         attr_accessor :title, :body, :author_email
         gangsta do
-          title vocab: "http://purl.org/dc/terms/"
-          body  vocab: "http://purl.org/dc/terms/"
-          author_email vocab: "http://purl.org/dc/terms/"
+          title
+          body 
+          author_email
         end
         
         def ==(another)
@@ -77,7 +65,7 @@ describe Gangsta do
     it_behaves_like 'bidirectional transformers in multiple formats'
   end
   
-  context 'nested dictionary' do
+  context 'nested schema' do
     before(:all) do
       class Post
         include Gangsta
